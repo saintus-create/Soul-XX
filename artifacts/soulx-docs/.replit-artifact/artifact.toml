@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "SoulX-Singer Docs"
+version = "1.0.0"
+id = "artifacts/soulx-docs"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 24223
+
+[services.development]
+run = "pnpm --filter @workspace/soulx-docs run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/soulx-docs", "run", "build" ]
+publicDir = "artifacts/soulx-docs/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "24223"
+BASE_PATH = "/"
