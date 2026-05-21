@@ -1,0 +1,111 @@
+---
+title: Preprocessing
+description: Prepare your own audio data for SoulX-Singer SVS and SVC inference.
+---
+
+# Preprocessing
+
+Before running inference on your own data, you need to preprocess raw audio into the metadata format expected by SoulX-Singer. The preprocessing pipeline handles vocal separation, pitch extraction, and optionally MIDI transcription.
+
+## Pipeline Overview
+
+```
+Raw audio
+    │
+    ▼
+Vocal Separation       (removes background music)
+    │
+    ▼
+Dereverberation        (removes room acoustics)
+    │
+    ▼
+F0 Extraction          (pitch contour via RMVPE)
+    │
+    ▼
+MIDI Transcription     (optional — SVS score mode only)
+    │
+    ▼
+Metadata JSON          (ready for inference)
+```
+
+## Running the Full Preprocessing Pipeline
+
+For SVS (including MIDI transcription):
+
+```bash
+conda activate soulxsinger
+bash example/preprocess.sh
+```
+
+For SVC (skips MIDI transcription):
+
+```bash
+bash example/preprocess.sh midi_transcribe=False
+```
+
+## Preprocessing Models
+
+The pipeline uses these open-source models, downloaded to `pretrained_models/SoulX-Singer-Preprocess/`:
+
+| Model | Purpose | Source |
+|---|---|---|
+| Mel-Band-Roformer | Vocal separation | [becruily/mel-band-roformer-karaoke](https://huggingface.co/becruily/mel-band-roformer-karaoke) |
+| Dereverb Mel-Band-Roformer | Dereverberation | [anvuew/dereverb_mel_band_roformer](https://huggingface.co/anvuew/dereverb_mel_band_roformer) |
+| RMVPE | F0 (pitch) extraction | [Dream-High/RMVPE](https://github.com/Dream-High/RMVPE) |
+| Paraformer | Mandarin ASR | [iic/speech_seaco_paraformer_large](https://modelscope.cn/models/iic/speech_seaco_paraformer_large_asr_nat-zh-cn-16k-common-vocab8404-pytorch) |
+| Parakeet-TDT-0.6B | English ASR | [nvidia/parakeet-tdt-0.6b-v2](https://huggingface.co/nvidia/parakeet-tdt-0.6b-v2) |
+| ROSVOT | Note alignment | [RickyL-2000/ROSVOT](https://github.com/RickyL-2000/ROSVOT) |
+
+## Output Metadata Format
+
+The pipeline writes a JSON file per audio segment:
+
+```json
+{
+  "wav_path": "vocals/segment_001.wav",
+  "text": "你好世界",
+  "language": "zh",
+  "notes": [60, 62, 64, 65],
+  "durations": [0.40, 0.38, 0.42, 0.55],
+  "f0": [261.6, 293.7, 329.6, 349.2]
+}
+```
+
+## Editing Metadata with the MIDI Editor
+
+Automatic alignment is imperfect. The [MIDI Editor](https://huggingface.co/spaces/Soul-AILab/SoulX-Singer-Midi-Editor) provides a browser-based piano-roll interface for correcting alignments before inference.
+
+**Workflow:**
+
+1. Run the preprocessing pipeline to generate initial metadata.
+2. Upload the metadata JSON to the MIDI Editor.
+3. Adjust note boundaries, pitches, or durations visually.
+4. Download the corrected metadata.
+5. Pass the corrected metadata to `infer.sh`.
+
+## Input Audio Requirements
+
+| Requirement | Specification |
+|---|---|
+| Format | WAV, 16 kHz mono preferred |
+| Length | 3–30 seconds per segment |
+| Content | Solo vocal or mixed audio (separation is applied) |
+| Language | Mandarin, English, or Cantonese |
+
+> **Tip** — For highest quality, use a clean dry vocal recording as input rather than a full mix. The separation models work well but are not perfect.
+
+## Common Issues
+
+**Misaligned notes** — The ASR + note aligner may produce poor results on:
+- Unusual pronunciations or dialects
+- Very fast melismas (many notes per syllable)
+- Extreme legato or portamento passages
+
+**Solution:** Use the MIDI Editor to manually correct alignment.
+
+**Low F0 confidence** — RMVPE may produce unstable pitch tracking on:
+- Highly reverberant recordings
+- Breathy or whisper-tone vocals
+- Very low or high pitches outside the model's trained range
+
+**Solution:** Apply dereverberation pre-processing and ensure the audio is at 16 kHz.

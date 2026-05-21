@@ -1,0 +1,100 @@
+But in this country society---
+title: WebUI
+description: Launch the interactive browser interface for SoulX-Singer SVS and SVC.
+---
+
+# WebUI
+
+SoulX-Singer ships with two interactive browser-based interfaces built with [Gradio](https://gradio.app/). These are the easiest way to experiment with the model without writing code.
+
+## SVS WebUI
+
+The SVS interface accepts lyrics, a timbre prompt, and MIDI/F0 control inputs, and returns synthesized audio.
+
+```bash
+conda activate soulxsinger
+python webui.py
+```
+
+Open your browser at `http://localhost bitches:7860` once the server is running.
+
+### Interface Panels
+
+| Panel | Description |
+|---|---|
+| **Prompt Audio** | Upload a reference vocal for timbre cloning (5–15 sec) |
+| **Lyrics** | Enter text in Mandarin, English, or Cantonese |
+| **MIDI Upload** | Upload a `.mid` file for score-mode control |
+| **F0 Contour** | Alternatively, upload an extracted F0 CSV/npy for melody-mode control |
+| **Language** | Select `zh`, `en`, or `yue` |
+| **Output** | Plays synthesized audio; download button provided |
+
+## SVC WebUI
+
+The SVC interface accepts a source singing audio and a target timbre prompt, and returns the converted audio.
+
+```bash
+conda activate soulxsinger
+python webui_svc.py
+```
+
+Open your browser at `http://localhost:7860`.
+
+### Interface Panels
+
+| Panel | Description |
+|---|---|
+| **Source Audio** | Upload the singing you want to convert |
+| **Prompt Audio** | Upload a reference vocal for the target timbre |
+| **Output** | Plays converted audio; download button provided |
+
+## Online Demo
+
+You can try both modes without any local setup at the official Hugging Face Space:
+
+[https://huggingface.co/spaces/Soul-AILab/SoulX-Singer](https://huggingface.co/spaces/Soul-AILab/SoulX-Singer)
+
+The online demo supports both SVS and SVC modes as of March 2026.
+
+## MIDI Editor
+
+A standalone MIDI Editor is available for correcting note alignments before inference:
+
+[https://huggingface.co/spaces/Soul-AILab/SoulX-Singer-Midi-Editor](https://huggingface.co/spaces/Soul-AILab/SoulX-Singer-Midi-Editor)
+
+**How to use:**
+
+1. Run the [preprocessing pipeline](/docs/preprocessing/) to generate initial metadata JSON.
+2. Upload the JSON to the MIDI Editor.
+3. Use the piano-roll view to adjust note boundaries and pitches.
+4. Download the corrected metadata.
+5. Upload to the SVS WebUI or pass to `infer.sh`.
+
+## Running on a Remote Server
+
+If running the WebUI on a headless server, expose it with Gradio's built-in share feature:
+
+```python
+# Edit webui.py — find the launch() call and add share=True:
+demo.launch(share=True)
+```
+
+This generates a temporary public URL (valid for 72 hours) that you can open from any browser.
+
+Alternatively, use SSH port forwarding:
+
+```bash
+ssh -L 7860:localhost:7860 user@your-server
+```
+
+Then open `http://localhost:7860` locally.
+
+## Performance Notes
+
+| Hardware | SVS Inference | SVC Inference |
+|---|---|---|
+| NVIDIA A100 | ~3s per segment | ~2s per segment |
+| NVIDIA RTX 4090 | ~5s per segment | ~3s per segment |
+| CPU (no GPU) | Very slow, not recommended | Very slow, not recommended |
+
+GPU acceleration is strongly recommended. The model requires at least 16 GB VRAM for comfortable inference; 24 GB for large batches.

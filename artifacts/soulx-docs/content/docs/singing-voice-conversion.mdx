@@ -1,0 +1,84 @@
+---
+title: Singing Voice Conversion (SVC)
+description: Convert existing singing audio to a target singer's voice without transcriptions or MIDI.
+---
+
+# Singing Voice Conversion (SVC)
+
+SoulX-Singer-SVC converts a source singing recording into the target singer's voice while preserving the original melody, rhythm, and lyrics. Unlike the SVS pipeline, SVC works directly from raw audio — no lyric transcription or MIDI notes are required.
+
+## How It Works
+
+SVC fine-tunes SoulX-Singer's generative capability on an audio-to-audio conversion objective. The model:
+
+1. Extracts the **pitch (F0)** and **content** from the source audio.
+2. Extracts the **timbre** from the target singer prompt.
+3. Synthesizes new audio combining the source content/pitch with the target timbre.
+
+This is fully transcription-free — no intermediate text or MIDI representation is used.
+
+## Running SVC Inference
+
+### With the example script
+
+```bash
+conda activate soulxsinger
+bash example/infer_svc.sh
+```
+
+### Custom inference
+
+```python
+from soulxsinger.infer_svc import SoulXSingerSVCInfer
+
+infer = SoulXSingerSVCInfer(
+    model_dir="pretrained_models/SoulX-Singer",
+    device="cuda",
+)
+
+result = infer.convert(
+    source_wav="path/to/source_singing.wav",   # audio to convert
+    prompt_wav="path/to/target_singer.wav",    # timbre reference
+)
+
+result.save("output_svc.wav")
+```
+
+## Preparing Your Own SVC Data
+
+To preprocess your own audio for SVC (without MIDI transcription):
+
+```bash
+bash example/preprocess.sh midi_transcribe=False
+```
+
+This runs only the steps needed for SVC:
+- Vocal separation (removes background music)
+- Dereverberation
+- F0 extraction
+
+MIDI transcription is skipped, so this runs significantly faster than the full SVS preprocessing pipeline.
+
+## SVC vs SVS — When to Use Each
+
+| | SVS | SVC |
+|---|---|---|
+| Input | Text lyrics + pitch | Raw audio |
+| Pitch control | Full (F0 or MIDI) | Preserved from source |
+| Requires transcription | Yes (automated or manual) | No |
+| Best for | New compositions | Voice style transfer |
+| Speed | Slower (preprocessing) | Faster |
+
+## Limitations
+
+- **Music bleed** — If the source audio contains heavy background music that is not fully separated, it may bleed into the output. Use a high-quality vocal separator or a clean dry vocal as input.
+- **Extreme pitch ranges** — Conversion quality degrades if the source pitch range is far outside the target singer's natural range.
+- **Language** — SVC is language-agnostic, but very language-specific vocal characteristics (e.g., tonal phonemes in Mandarin) may be imperfectly preserved when converting across languages.
+- **Style** — Unusual vocal styles (extreme vibrato, growling, falsetto) may not transfer cleanly.
+
+## Tips for Best Results
+
+- Use a **clean, isolated vocal** for both source and prompt. Vocal separation (`preprocess.sh`) helps, but a dry studio recording is ideal.
+- Keep the **prompt recording to 5–15 seconds** — enough to capture stable timbre without over-fitting to a specific phrase.
+- Match the **pitch range** of source to target where possible. Shifting pitch by more than an octave degrades quality.
+- For cross-lingual conversion (e.g., Mandarin source → English-accented timbre), expect some accent mixing — this is a known limitation.

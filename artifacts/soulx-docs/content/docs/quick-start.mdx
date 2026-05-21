@@ -1,0 +1,104 @@
+---
+title: Quick Start
+description: Install SoulX-Singer, download pretrained models, and run your first inference.
+---
+
+# Quick Start
+
+Get SoulX-Singer running locally in four steps.
+
+## Prerequisites
+
+- Python 3.10
+- Conda (recommended) — [install Miniconda](https://docs.conda.io/en/latest/miniconda.html)
+- Git
+- ~20 GB disk space for model weights
+
+## 1. Clone the Repository
+
+```bash
+git clone https://github.com/Soul-AILab/SoulX-Singer.git
+cd SoulX-Singer
+```
+
+## 2. Set Up Environment
+
+Create and activate a dedicated Conda environment:
+
+```bash
+conda create -n soulxsinger -y python=3.10
+conda activate soulxsinger
+```
+
+Install Python dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+> **Users in mainland China** — use a PyPI mirror to avoid slow downloads:
+>
+> ```bash
+> pip install -r requirements.txt \
+>   -i https://mirrors.aliyun.com/pypi/simple/ \
+>   --trusted-host=mirrors.aliyun.com
+> ```
+
+## 3. Download Pretrained Models
+
+Install the Hugging Face Hub CLI if needed:
+
+```bash
+pip install -U huggingface_hub
+```
+
+Download the SVS and SVC model weights, plus preprocessing models:
+
+```bash
+# SVS and SVC model
+hf download Soul-AILab/SoulX-Singer \
+  --local-dir pretrained_models/SoulX-Singer
+
+# Preprocessing models
+hf download Soul-AILab/SoulX-Singer-Preprocess \
+  --local-dir pretrained_models/SoulX-Singer-Preprocess
+```
+
+## 4. Run the Demo
+
+### Singing Voice Synthesis
+
+```bash
+bash example/infer.sh
+```
+
+### Singing Voice Conversion
+
+```bash
+bash example/infer_svc.sh
+```
+
+> **Note** — The demo scripts rely on preprocessed metadata (vocal separation, transcription). For your own audio, follow the [Preprocessing](/docs/preprocessing/) guide first, then run inference.
+
+## Directory Layout After Setup
+
+```
+SoulX-Singer/
+├── pretrained_models/
+│   ├── SoulX-Singer/          # SVS + SVC weights
+│   └── SoulX-Singer-Preprocess/  # Preprocessing models
+├── example/
+│   ├── infer.sh               # SVS demo script
+│   └── infer_svc.sh           # SVC demo script
+├── preprocess/                # Preprocessing pipeline
+├── soulxsinger/               # Core model code
+├── webui.py                   # SVS web interface
+├── webui_svc.py               # SVC web interface
+└── requirements.txt
+```
+
+## Next Steps
+
+- [Singing Voice Synthesis →](/docs/singing-voice-synthesis/) — understand F0 and MIDI control modes
+- [Singing Voice Conversion →](/docs/singing-voice-conversion/) — audio-to-audio conversion
+- [WebUI →](/docs/webui/) — launch the interactive browser interface

@@ -1,0 +1,50 @@
+---
+title: Introduction
+description: Overview of SoulX-Singer, a high-fidelity zero-shot singing voice synthesis and conversion model.
+---
+
+# Introduction
+
+**SoulX-Singer** is a high-fidelity, zero-shot singing voice synthesis (SVS) model that generates realistic singing voices for unseen singers — with no fine-tuning required. It supports two flexible control modes for precise pitch, rhythm, and expression.
+
+**SoulX-Singer-SVC** is a companion singing voice conversion (SVC) model fine-tuned from SoulX-Singer. It transforms a source singing recording into a target singer's voice while preserving melody, rhythm, and lyrical content — without requiring lyric or MIDI transcriptions.
+
+## Key Features
+
+### Singing Voice Synthesis (SVS)
+
+- **Zero-Shot Singing** — Generate high-fidelity voices for unseen singers without any fine-tuning.
+- **Flexible Control Modes** — Melody (F0 contour) and Score (MIDI) conditioning.
+- **Large-Scale Training** — 42,000+ hours of aligned vocals, lyrics, and notes across Mandarin, English, and Cantonese.
+- **Timbre Cloning** — Preserve singer identity across languages, styles, and edited lyrics.
+- **Singing Voice Editing** — Modify lyrics while retaining natural prosody.
+- **Cross-Lingual Synthesis** — High-fidelity synthesis via disentangled timbre from content.
+
+### Singing Voice Conversion (SVC)
+
+- **Zero-Shot Timbre and Style Transfer** — Transfer singer identity and style to unseen voices without per-speaker fine-tuning.
+- **Language-Agnostic Conversion** — Works across multilingual singing content.
+- **Transcription-Free Audio-to-Audio** — Convert singing directly from audio without lyrics or MIDI inputs.
+
+## Architecture
+
+SoulX-Singer is built on the strong generative capability of flow-matching, trained on an industry-scale dataset. The model disentangles timbre from content, enabling robust cross-lingual and cross-style synthesis. SVC capability is added by fine-tuning SoulX-Singer on audio-to-audio conversion objectives.
+
+## Resources
+
+| Resource | Link |
+|---|---|
+| Paper (arXiv) | [arXiv:2602.07803](https://arxiv.org/abs/2602.07803) |
+| Online Demo | [Hugging Face Spaces](https://huggingface.co/spaces/Soul-AILab/SoulX-Singer) |
+| Model Weights | [Soul-AILab/SoulX-Singer](https://huggingface.co/Soul-AILab/SoulX-Singer) |
+| MIDI Editor | [HF Space](https://huggingface.co/spaces/Soul-AILab/SoulX-Singer-Midi-Editor) |
+| Eval Dataset | [Soul-AILab/SoulX-Singer-Eval-Dataset](https://huggingface.co/datasets/Soul-AILab/SoulX-Singer-Eval-Dataset) |
+| GitHub | [Soul-AILab/SoulX-Singer](https://github.com/Soul-AILab/SoulX-Singer) |
+
+## News
+
+- **[2026-03-16]** SoulX-Singer-SVC released. The online demo now supports singing voice conversion.
+- **[2026-02-12]** SoulX-Singer Eval Dataset published on Hugging Face.
+- **[2026-02-09]** Online demo live on Hugging Face Spaces.
+- **[2026-02-08]** MIDI Editor deployed on Hugging Face Spaces.
+- **[2026-02-06]** Inference code and model weights released.

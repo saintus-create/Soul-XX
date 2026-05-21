@@ -1,0 +1,102 @@
+---
+title: Singing Voice Synthesis (SVS)
+description: Generate singing voices from lyrics and pitch information using SoulX-Singer's two control modes.
+---
+
+# Singing Voice Synthesis (SVS)
+
+SoulX-Singer generates high-fidelity singing audio from text lyrics combined with pitch information. Two control modes are supported depending on the input format you have available.
+
+## Control Modes
+
+### Melody Mode (F0 Contour)
+
+Provide a raw pitch contour (fundamental frequency over time) extracted from a reference audio file. This is the most flexible mode — no MIDI is required.
+
+**Use this mode when:**
+- You have a reference vocal recording to clone pitch from
+- You want to use pitch extracted by tools like RMVPE
+- You are doing voice editing (keeping the original melody)
+
+### Score Mode (MIDI Notes)
+
+Provide a standard MIDI file defining exact note pitches and durations. This gives precise, deterministic pitch control.
+
+**Use this mode when:**
+- You have a MIDI score or piano roll
+- You want to compose new melodies from scratch
+- You need repeatable, exact pitch sequences
+
+## Input Format
+
+Both modes require a **metadata JSON** file that links the input fields together. The metadata is produced by the [preprocessing pipeline](/docs/preprocessing/) and can be refined with the [MIDI Editor](/docs/webui/).
+
+### Metadata Fields
+
+| Field | Type | Description |
+|---|---|---|
+| `wav_path` | string | Path to the prompt vocal (for timbre reference) |
+| `text` | string | Lyrics to synthesize |
+| `notes` | list | MIDI note sequence (score mode) |
+| `f0` | list | F0 contour in Hz (melody mode) |
+| `duration` | list | Per-phoneme durations in seconds |
+| `language` | string | `"zh"`, `"en"`, or `"yue"` (Cantonese) |
+
+## Running SVS Inference
+
+### With the example script
+
+```bash
+conda activate soulxsinger
+bash example/infer.sh
+```
+
+The script reads from `example/metadata/` and writes audio to `example/output/`.
+
+### Custom inference
+
+```python
+from soulxsinger.infer import SoulXSingerInfer
+
+infer = SoulXSingerInfer(
+    model_dir="pretrained_models/SoulX-Singer",
+    device="cuda",   # or "cpu"
+)
+
+result = infer.synthesize(
+    prompt_wav="path/to/singer_reference.wav",
+    text="你好世界",
+    notes=[60, 62, 64],          # MIDI note numbers (score mode)
+    durations=[0.4, 0.4, 0.5],
+    language="zh",
+)
+
+result.save("output.wav")
+```
+
+## Alignment Quality
+
+> **Important** — The automatic preprocessing pipeline may not produce perfectly aligned lyrics-to-notes mappings. For best synthesis quality, manually verify and correct the alignment using the [MIDI Editor](https://huggingface.co/spaces/Soul-AILab/SoulX-Singer-Midi-Editor) before inference.
+
+Common misalignment symptoms:
+- Pitch "drifts" between phonemes
+- A syllable is held too long or cut short
+- Notes don't match the expected melody
+
+The MIDI Editor provides a visual piano-roll interface for correcting these issues without re-running the full preprocessing pipeline.
+
+## Supported Languages
+
+| Language | Code | Notes |
+|---|---|---|
+| Mandarin Chinese | `zh` | Full support, largest training data |
+| English | `en` | Full support |
+| Cantonese | `yue` | Full support |
+| Cross-lingual | — | Mix `zh`/`en` in one synthesis by disentangling timbre |
+
+## Tips for Best Results
+
+- Use a **clean, dry vocal recording** (no reverb, no background music) as the timbre prompt.
+- Keep prompt recordings to **5–15 seconds** for stable timbre extraction.
+- For MIDI mode, quantize notes to a reasonable grid — overly fine-grained note sequences can produce artifacts.
+- For cross-lingual synthesis, use a same-language reference where possible, then switch language in the `text` field.
