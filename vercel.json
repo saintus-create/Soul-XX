@@ -1,0 +1,6 @@
+{
+  "buildCommand": "pnpm --filter @workspace/soulx-docs run build",
+  "outputDirectory": "artifacts/soulx-docs/out",
+  "installCommand": "pnpm install --frozen-lockfile",
+  "framework": null
+}
