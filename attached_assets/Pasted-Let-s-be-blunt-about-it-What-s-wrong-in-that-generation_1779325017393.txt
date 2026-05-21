@@ -1,0 +1,88 @@
+Let’s be blunt about it:
+What’s wrong in that generation
+These parts are not real engineering steps:
+createArtifact()
+“checking artifact.toml format”
+“port 24223”
+“delete Vite scaffold in parallel”
+“Replit routing system”
+“actions”
+None of that is Next.js, Node, or any real deployment model.
+It’s the model slipping into a “workspace fantasy layer” where it invents:
+tool APIs that don’t exist
+deployment orchestration steps
+hidden runtime systems
+pseudo-parallel build pipelines
+That’s exactly the Replit-style coupling you were annoyed by—but now it’s hallucinated instead of real.
+What it should have done instead
+For your request:
+“Docs site using Next.js + shadcn UI, portable, ElevenLabs-style”
+The correct flow is:
+pick architecture (Next.js App Router + MDX)
+define file structure
+define dependencies (only real npm packages)
+generate clean project files
+no platform assumptions, no fake tooling
+That’s it.
+No “artifact system”. No ports being “assigned”. No orchestration layer.
+Clean, portable architecture (what you actually want)
+Stack (minimal, real)
+Next.js (App Router)
+MDX (for docs content)
+Tailwind CSS
+shadcn/ui (optional component layer)
+No Vite. No Replit tooling. No runtime magic.
+File structure
+/app
+  layout.tsx
+  page.tsx
+  /docs
+    /[slug]
+      page.tsx
+
+/components
+  docs-sidebar.tsx
+  docs-header.tsx
+
+/content
+  docs/
+    index.mdx
+    quickstart.mdx
+    api.mdx
+
+/lib
+  mdx.ts
+  docs.ts
+
+/public
+/styles
+  globals.css
+Key design decision (important)
+You want:
+“deploy anywhere without modification”
+So we avoid:
+server-only APIs
+platform routing adapters
+runtime env coupling
+We use:
+static MDX rendering
+file-based routing only
+no backend dependency required for docs
+Why the earlier output drifted
+Because the model tried to “solve everything at once”:
+detect Replit coupling ✔
+choose stack ✔
+build system ✔
+simulate deployment ✔ ← this is where it broke
+That last step is where hallucinated tooling appears.
+If you want the correct next step
+I can generate a clean, production-ready docs starter for you:
+Next.js 15 App Router
+MDX-powered docs
+shadcn/ui layout (sidebar + header)
+clean ElevenLabs-style UI direction
+zero Replit assumptions
+deployable to Vercel / Netlify / Cloudflare Pages / local Node
+Just say:
+“generate clean scaffold”
+and I’ll build it without any of the fake orchestration layer you just saw.
